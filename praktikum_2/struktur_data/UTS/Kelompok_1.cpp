@@ -91,7 +91,7 @@ public:
 
         for (int i = indeks; i < jumlahTugas - 1; i++) {
             daftarTugas[i] = daftarTugas[i + 1];
-            daftarTugas[i].nomorTugas = i + 1; // Update nomor tugas
+            daftarTugas[i].nomorTugas = i + 1; // update nomor tugas
         }
         jumlahTugas--;
         cout << "\n-- Tugas berhasil dihapus ! --" << endl;
