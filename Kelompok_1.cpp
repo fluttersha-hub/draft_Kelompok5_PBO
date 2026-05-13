@@ -88,6 +88,10 @@ public:
             delete hapus;
         }
         qRear = NULL;
+
+        for (int i = 0; 1 <= topUndo; i++) {
+            delete undoStack[i];
+        }
         topUndo = -1;
     }
 
@@ -229,7 +233,8 @@ public:
         cout << "-------------------------------------------------" << endl;
         baru->mataKuliah = daftarMatkul[pilih - 1];
         cout << "Deadline (DDMMYYYY): "; cin >> baru->deadline;
-        cout << "Prioritas            : "; baru->prioritas = inputAngka(1,100);
+        cout << "\n1 = Sangat Penting | 2 = Penting | 3 = Tidak Mendesak" << endl;
+        cout << "Prioritas            : "; baru->prioritas = inputAngka(1,3);
         baru->status = "Belum";
         baru->subTugas = NULL;
         baru->next = head;
@@ -391,6 +396,8 @@ public:
                     klikEnter();
                     continue;
                 }
+
+
 
                 if (dipilih) {
                     NodeQueue* baru = new NodeQueue;
@@ -656,6 +663,7 @@ public:
             for (int i = idx; i < topUndo; i++) {
                 undoStack[i] = undoStack[i + 1];
             }
+            undoStack[topUndo] = NULL;
             topUndo--;
 
             kembali->next = head;
