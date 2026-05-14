@@ -2,48 +2,138 @@
 #include <string>
 using namespace std;
 
-struct Tugas {
-    string namaTugas;
-    string mataKuliah;
-    string deadline;
-    int prioritas;
-    string status;
-    Tugas* next;
-    Tugas* subTugas;
-};
-
 struct Akun {
     string username;
     string password;
     string namaLengkap;
 };
 
+// Struct untuk Singly Linked List & Tree (Sub-tugas)
+struct Tugas {
+    string namaTugas;
+    string mataKuliah;
+    string deadline;
+    int prioritas;
+    string status;
+    Tugas* next;       // Pointer ke tugas selanjutnya (Linked List)
+    Tugas* subTugas;   // Pointer ke sub-tugas (Tree / Hierarki)
+};
+
+// Struct untuk Queue (Antrian tugas yang dikerjakan)
 struct NodeQueue {
     Tugas* dataTugas;
     NodeQueue* next;
 };
 
-int inputAngka(int min, int max) {
-    int x;
-    while (true) {
-        cin >> x;
-        if (!cin.fail() && x >= min && x <= max) {
-            cin.ignore(1000, '\n');
-            return x;
-        }
-        cin.clear();
-        cin.ignore(1000, '\n');
-        cout << "\nInput tidak valid! Masukkan angka yang benar: ";
+class SistemDasar {
+public:
+    void bersihkanLayar() {
+        system("cls"); 
     }
-}
 
-class ManajemenTugas {
+    void klikEnter() {
+        cout << "\nTekan Enter untuk melanjutkan...";
+        cin.get();
+    }
+
+    // Fungsi untuk memastikan inputan berupa angka yang valid
+    int inputAngka(int min, int max) {
+        int x;
+        while (true) {
+            cin >> x;
+            if (!cin.fail() && x >= min && x <= max) {
+                cin.ignore(1000, '\n');
+                return x;
+            }
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "\nInput tidak valid! Masukkan angka yang benar: ";
+        }
+    }
+};
+
+class SistemAkun {
 protected:
-    Tugas* head;
-    Tugas* undoStack[10];
+    Akun daftarAkun[50];
+    int jumlahAkun;
+    string namaUserAktif;
+    SistemDasar util;
+
+public:
+    SistemAkun() {
+        // Data akun bawaan
+        daftarAkun[0] = {"omar", "omarganteng", "Humaira"};
+        daftarAkun[1] = {"amiw", "1119", "Amisha"};
+        daftarAkun[2] = {"faqihganteng", "faqih07", "Fariid Faqih"};
+        jumlahAkun = 3;
+    }
+
+    string menuAwal() {
+        int pilihan;
+        while (true) {
+            util.bersihkanLayar();
+            cout << "========================================================\n";
+            cout << "            SISTEM MANAJEMEN TUGAS MAHASISWA            \n";
+            cout << "========================================================\n";
+            cout << "1. Login\n";
+            cout << "2. Registrasi\n";
+            cout << "0. Tutup Program\n";
+            cout << "Pilih: ";
+            pilihan = util.inputAngka(0, 2);
+
+            if (pilihan == 1) {
+                string user, pass;
+                util.bersihkanLayar();
+                cout << "========================================================\n";
+                cout << "            SISTEM MANAJEMEN TUGAS MAHASISWA            \n";
+                cout << "========================================================\n";
+                cout << "Silakan Masuk terlebih dahulu.\n";
+                cout << "Username: "; cin >> user;
+                cout << "Password: "; cin >> pass;
+                cin.ignore(); 
+
+                bool berhasil = false;
+                for (int i = 0; i < jumlahAkun; i++) {
+                    if (user == daftarAkun[i].username && pass == daftarAkun[i].password) {
+                        namaUserAktif = daftarAkun[i].namaLengkap;
+                        return namaUserAktif; // Berhasil login, kirim nama user
+                    }
+                }
+                
+                cout << "\nAkses Ditolak! Username atau Password salah." << endl;
+                util.klikEnter();
+
+            } else if (pilihan == 2) {
+                util.bersihkanLayar();
+                cout << "========================================================\n";
+                cout << "                   REGISTRASI AKUN                      \n";
+                cout << "========================================================\n";
+                cout << "Username     : "; cin >> daftarAkun[jumlahAkun].username;
+                cout << "Password     : "; cin >> daftarAkun[jumlahAkun].password;
+                cin.ignore();
+                cout << "Nama Lengkap : "; getline(cin, daftarAkun[jumlahAkun].namaLengkap);
+                
+                jumlahAkun++;
+                cout << "\nRegistrasi Berhasil! Silakan Login menggunakan akun baru Anda.\n";
+                util.klikEnter();
+
+            } else {
+                cout << "======================================================" << endl;
+                cout << "   Terima kasih sudah menggunakan Program Ini ^^      " << endl;
+                cout << "======================================================" << endl;
+                return 0;
+            }
+        }
+    }
+};
+
+class ManajemenTugas : public SistemDasar, public SistemAkun {
+protected:
+    Tugas* head;              // Head Singly Linked List
+    Tugas* undoStack[10];     // Array of Pointers untuk Stack Undo (Hapus)
     int topUndo;
-    NodeQueue* qFront;
-    NodeQueue* qRear;
+    NodeQueue* qFront;        // Front Queue
+    NodeQueue* qRear;         // Rear Queue
 
     string daftarMatkul[8] = {
         "Struktur Data", "OOP", "Statistika dan Probabilitas",
@@ -57,15 +147,6 @@ public:
         topUndo = -1;
         qFront = NULL;
         qRear = NULL;
-    }
-
-    void bersihkanLayar() {
-            system("cls");
-    }
-
-    void klikEnter() {
-        cout << "\nTekan Enter untuk melanjutkan...";
-        cin.get();
     }
 
     void hapusSubTugas(Tugas* n) {
@@ -88,14 +169,13 @@ public:
             delete hapus;
         }
         qRear = NULL;
-
-        for (int i = 0; 1 <= topUndo; i++) {
+        for (int i = 0; i <= topUndo; i++) {
             delete undoStack[i];
         }
         topUndo = -1;
     }
 
-    void tugasAwal(string nama, string mk, string dl, int prio) {
+    void inisialisasiTugas(string nama, string mk, string dl, int prio) {
         Tugas* baru = new Tugas;
         baru->namaTugas = nama;
         baru->mataKuliah = mk;
@@ -107,52 +187,22 @@ public:
         head = baru;
     }
 
-    void inisialisasiTugas(string namaLengkap) {
+    void tugasAwal(string namaLengkap) {
         resetData();
         if (namaLengkap == "Humaira") {
-            tugasAwal("Laporan Praktikum", "Struktur Data", "19052026", 1);
-            tugasAwal("Laporan Proposal", "Kewirausahaan", "25052026", 2);
-            tugasAwal("Project Akhir", "OOP", "27052026", 3);
+            inisialisasiTugas("Laporan Praktikum", "Struktur Data", "19052026", 1);
+            inisialisasiTugas("Laporan Proposal", "Kewirausahaan", "25052026", 2);
+            inisialisasiTugas("Project Akhir", "OOP", "27052026", 3);
         } else if (namaLengkap == "Amisha") {
-            tugasAwal("Tugas DataSet", "Statistika dan Probabilitas", "21052026", 1);
-            tugasAwal("Membuat Resume", "Kewarganegaraan", "22052026", 3);
+            inisialisasiTugas("Tugas DataSet", "Statistika dan Probabilitas", "21052026", 1);
+            inisialisasiTugas("Membuat Resume", "Kewarganegaraan", "22052026", 3);
         }
     }
 };
 
-class Login : public ManajemenTugas {
+class FiturSistem : public ManajemenTugas {
 public:
-    string login() {
-        Akun daftarAkun[3] = {
-            {"omar", "omarganteng", "Humaira"},
-            {"amiw", "1119", "Amisha"},
-            {"faqihganteng", "faqih07", "Fariid Faqih"}
-        };
-        string username, pass;
-        while (true) {
-            bersihkanLayar();
-            cout << "========================================================" << endl;
-            cout << "            SISTEM MANAJEMEN TUGAS MAHASISWA            " << endl;
-            cout << "========================================================" << endl;
-            cout << "Silakan Masuk terlebih dahulu.\n";
-            cout << "Username: "; cin >> username;
-            cout << "Password: "; cin >> pass;
-            for (int i = 0; i < 3; i++) {
-                if (username == daftarAkun[i].username && pass == daftarAkun[i].password) {
-                    inisialisasiTugas(daftarAkun[i].namaLengkap);
-                    return daftarAkun[i].namaLengkap;
-                }
-            }
-            cout << "\nAkses Ditolak! Coba lagi." << endl;
-            cin.get(); 
-            klikEnter();
-        }
-    }
-};
-
-class Dashboard : public Login {
-public:
-    void tampilkanDashboard(string nama) {
+        void tampilkanDashboard() {
         int total = 0, selesai = 0;
         Tugas* temp = head;
         while (temp != NULL) {
@@ -167,7 +217,7 @@ public:
         cout << "==============================================================" << endl;
         cout << "               SISTEM MANAJEMEN TUGAS MAHASISWA               " << endl;
         cout << "==============================================================" << endl;
-        cout << "| Halo, " << nama << "!" << endl;
+        cout << "| Halo, " << namaUserAktif << "!" << endl;
         cout << "  Hari Ini: Selasa, 19/05/2026" << endl << endl;
 
         cout << "+--------------------- STATISTIK TUGAS ----------------------+" << endl;
@@ -191,8 +241,8 @@ public:
         bool ada = false;
 
         while (temp) {
-            if (temp->deadline <= batasTanggal && temp->status == "Belum") {
-                cout << "| >> !!! Tugas '" << temp->namaTugas << "' melewati deadline !!!" << endl;
+            if (temp->deadline < batasTanggal && temp->status == "Belum") {
+                cout << "| >> Tugas '" << temp->namaTugas << "' melewati deadline !!!" << endl;
                 ada = true;
             }
             temp = temp->next;
@@ -211,22 +261,21 @@ public:
         cout << "] " << (int)persen << "%" << endl;
         cout << "==============================================================" << endl << endl;
     }
-};
 
-class AddTugas : public Dashboard {
-public:
     void tambahTugas() {
         bersihkanLayar();
         Tugas* baru = new Tugas;
         cout << "=============== TAMBAH TUGAS BARU ===============" << endl;
-        cout << "\nNama Tugas         : "; getline(cin, baru->namaTugas);
+        cout << "\nNama Tugas         : "; 
+        cin.ignore();
+        getline(cin, baru->namaTugas);
 
         cout << "-------------------------------------------------" << endl;
         int pilih;
         while (true) {
             cout << "\nDaftar Mata Kuliah:" << endl;
             for (int i = 0; i < 8; i++) cout << i + 1 << ". " << daftarMatkul[i] << endl;
-            cout << "\nPilih (1-8): "; pilih = inputAngka(1,8);
+            cout << "\nPilih (1-8): "; pilih = inputAngka(1, 8);
             if (pilih >= 1 && pilih <= 8) break;
         }
 
@@ -234,99 +283,95 @@ public:
         baru->mataKuliah = daftarMatkul[pilih - 1];
         cout << "Deadline (DDMMYYYY): "; cin >> baru->deadline;
         cout << "\n1 = Sangat Penting | 2 = Penting | 3 = Tidak Mendesak" << endl;
-        cout << "Prioritas            : "; baru->prioritas = inputAngka(1,3);
+        cout << "Prioritas            : "; baru->prioritas = inputAngka(1, 3);
+        
         baru->status = "Belum";
         baru->subTugas = NULL;
-        baru->next = head;
+        baru->next = head; // Menyambungkan di awal Linked List
         head = baru;
+
         cout << "-------------------------------------------------" << endl;
         cout << ">>> Tugas Berhasil Disimpan <<<" << endl;
         klikEnter();
     }
-};
 
-class SortingTugas : public AddTugas { 
-public:
     void urutkanTugas() {
-    if (!head || !head->next) return;
+        if (!head || !head->next) return;
 
-    bool swapped;
-    do {
-        swapped = false;
-        Tugas** ptr = &head;
+        bool ditukar;
+        do {
+            ditukar = false;
+            Tugas* curr = head;
 
-        while ((*ptr)->next) {
-            Tugas* a = *ptr;
-            Tugas* b = a->next;
+            while (curr->next != NULL) {
+                bool harusTukar = false;
+                
+                if (curr->prioritas > curr->next->prioritas) {
+                    harusTukar = true;
+                } else if (curr->prioritas == curr->next->prioritas) {
+                    if (curr->deadline > curr->next->deadline) {
+                        harusTukar = true;
+                    }
+                }
 
-            bool harusTukar = false;
-
-            if (a->prioritas > b->prioritas) harusTukar = true;
-            else if (a->prioritas == b->prioritas) {
-                if (a->deadline > b->deadline) harusTukar = true;
+                if (harusTukar) {
+                    // Cukup tukar isinya, list tetap menyambung dengan baik
+                    swap(curr->namaTugas, curr->next->namaTugas);
+                    swap(curr->mataKuliah, curr->next->mataKuliah);
+                    swap(curr->deadline, curr->next->deadline);
+                    swap(curr->prioritas, curr->next->prioritas);
+                    swap(curr->status, curr->next->status);
+                    swap(curr->subTugas, curr->next->subTugas);
+                    
+                    ditukar = true;
+                }
+                curr = curr->next;
             }
+        } while (ditukar);
+    }
 
-            if (harusTukar) {
-                a->next = b->next;
-                b->next = a;
-                *ptr = b;
-                swapped = true;
-            }
-
-            ptr = &((*ptr)->next);
-        }
-    } while (swapped);
-}
-};
-
-class ViewTugas : public SortingTugas {
-public:
-    void tampilkanTugas() { // tampilkan tugas sekalian bajalankan sorting dan tandai tugas yang sudah selesai
-        int tugas;
+    void tampilkanTugas() {
+        int tugasPilihan;
         do {
             bersihkanLayar();
             cout << "================== DAFTAR TUGAS SAAT INI ==================\n\n";
             cout << "No    Deadline\t\tPrioritas\tNama Tugas + [Status]" << endl;
             cout << "--------------------------------------------------------------" << endl;
+            
             Tugas* temp = head;
             int jumlahTugas = 0;
             if (!temp) cout << "Daftar masih kosong." << endl;
+            
             while (temp) {
                 cout << ++jumlahTugas << ".    [" << temp->deadline << "]\t" << temp->prioritas << "\t\t"
                     << temp->namaTugas << " (" << temp->mataKuliah << ") [" << temp->status << "]" << endl << endl;
                 temp = temp->next;
             }
+            
             cout << "--------------------------------------------------------------" << endl;
             cout << "1. Urutkan Otomatis (Prioritas & Deadline)" << endl;
             cout << "2. Tandai Selesai" << endl;
             cout << "0. Kembali ke Dashboard" << endl;
-            cout << "Pilih: "; tugas = inputAngka(0,2);
+            cout << "Pilih: "; tugasPilihan = inputAngka(0, 2);
 
             cout << "-----------------------------------------------------------------------" << endl;
-            if (tugas == 1) urutkanTugas();
-            else if (tugas == 2 && head) {
+            
+            if (tugasPilihan == 1) {
+                urutkanTugas();
+            } else if (tugasPilihan == 2 && head) {
                 int nomor;
                 cout << "Pilih nomor: "; 
-                while (true) {
-                    cin >> nomor;
-                    if (!cin.fail() && nomor >= 1 && nomor <= jumlahTugas) {
-                        cin.ignore(1000, '\n');
-                        break;
-                    }
-                    cin.clear();
-                    cin.ignore(1000, '\n');
-                    cout << "\nInput tidak valid! Masukkan angka yang benar: ";
-                }
+                nomor = inputAngka(1, jumlahTugas);
+                
                 Tugas* t = head;
-                for (int j = 1; j < nomor && t; j++) t = t->next;
+                for (int j = 1; j < nomor && t; j++) {
+                    t = t->next;
+                }
                 if (t) t->status = "Selesai";
             }
-        } while (tugas != 0);
+        } while (tugasPilihan != 0);
     }
-};
 
-class TugasDikerjakan : public ViewTugas {
-public:
     void menuTugasDikerjakan() {
         int pilih;
         do {
@@ -351,7 +396,7 @@ public:
             cout << "| 2. Selesaikan Tugas Teratas                                |" << endl;
             cout << "| 0. Kembali ke Dashboard                                    |" << endl;
             cout << "-------------------------------------------------------------" << endl;
-            cout << "Pilih: "; pilih = inputAngka(0,2);
+            cout << "Pilih: "; pilih = inputAngka(0, 2);
 
             if (pilih == 1) {
                 if (!head) { cout << "Daftar tugas kosong!"; klikEnter(); continue; }
@@ -366,20 +411,12 @@ public:
                 
                 int nomor;
                 cout << "Pilih nomor: "; 
-                while (true) {
-                    cin >> nomor;
-                    if (!cin.fail() && nomor >= 1 && nomor <= jumlahTugas) {
-                        cin.ignore(1000, '\n');
-                        break;
-                    }
-                    cin.clear();
-                    cin.ignore(1000, '\n');
-                    cout << "\nInput tidak valid! Masukkan angka yang benar: ";
-                }
+                nomor = inputAngka(1, jumlahTugas);
 
                 Tugas* dipilih = head;
                 for (int j = 1; j < nomor && dipilih; j++) dipilih = dipilih->next;
 
+                // Cek apakah sudah ada di queue
                 bool sudahAda = false;
                 NodeQueue* cek = qFront;
                 while (cek) {
@@ -397,23 +434,35 @@ public:
                     continue;
                 }
 
+                if (dipilih->status == "Selesai") {
+                    cout << "\n>> Tugas sudah selesai, tidak perlu dikerjakan lagi!" << endl;
+                    klikEnter(); 
+                    continue;
+                }
 
-
+                // Masukkan ke Queue
                 if (dipilih) {
                     NodeQueue* baru = new NodeQueue;
                     baru->dataTugas = dipilih;
                     baru->next = NULL;
-                    if (qRear == NULL) qFront = qRear = baru;
-                    else { qRear->next = baru; qRear = baru; }
+                    if (qRear == NULL) {
+                        qFront = qRear = baru;
+                    } else { 
+                        qRear->next = baru; 
+                        qRear = baru; 
+                    }
                     cout << ">> Berhasil masuk antrian!";
                 }
             } else if (pilih == 2) {
-                if (!qFront) { cout << "Antrian sudah kosong!"; }
-                else {
+                if (!qFront) { 
+                    cout << "Antrian sudah kosong!"; 
+                } else {
                     NodeQueue* hapus = qFront;
                     hapus->dataTugas->status = "Selesai";
+                    
                     qFront = qFront->next;
-                    if (qFront == NULL) qRear = NULL;
+                    if (qFront == NULL) qRear = NULL; // Queue habis
+                    
                     cout << "\n>> Tugas '" << hapus->dataTugas->namaTugas << "' Selesai!" << endl;
                     delete hapus;
                 }
@@ -421,82 +470,18 @@ public:
             }
         } while (pilih != 0);
     }
-};
 
-class Hierarki : public TugasDikerjakan {
-public:
     void tampilkanHierarki(Tugas* n, int level) {
-    while (n) {
-        for (int i = 0; i < level; i++) 
-            cout << "|   ";
+        while (n) {
+            for (int i = 0; i < level; i++) cout << "|   ";
+            if (level > 0) cout << "|-- ";
+            cout << n->namaTugas << " [" << n->status << "]" << endl;
 
-        if (level > 0) 
-            cout << "|-- ";
-
-        cout << n->namaTugas << " [" << n->status << "]" << endl;
-
-        if (n->subTugas) {
-            tampilkanHierarki(n->subTugas, level + 1);
-        }
-        n = n->next;
-        }
-    }
-
-    void tambahSubTugas() {
-        if (!head) {
-            cout << "--------------------------------------------------------" << endl;
-            cout << "Belum ada tugas. Tambahkan tugas dulu!" << endl;
-            klikEnter();
-            return;
-        }
-
-        bersihkanLayar();
-        cout << "====================== PILIH TUGAS =====================" << endl;
-        Tugas* temp = head;
-        int jumlahTugas = 0;
-        while (temp) {
-            cout << ++jumlahTugas << ". " << temp->namaTugas << endl;
-            temp = temp->next;;
-        }
-        cout << "--------------------------------------------------------" << endl;
-
-        int pilih;
-        cout << "Pilih nomor: "; 
-        while (true) {
-            cin >> pilih;
-            if (!cin.fail() && pilih >= 1 && pilih <= jumlahTugas) {
-                cin.ignore(1000, '\n');
-                break;
+            if (n->subTugas) {
+                tampilkanHierarki(n->subTugas, level + 1);
             }
-            cin.clear();
-            cin.ignore(1000, '\n');
-            cout << "\nInput tidak valid! Masukkan angka yang benar: ";
+            n = n->next;
         }
-
-        Tugas* parent = head;
-        for (int j = 1; j < pilih && parent; j++) parent = parent->next;
-
-        if (!parent) {
-        cout << "\nNomor tidak valid!" << endl;
-        klikEnter();
-        return;
-        }
-
-        Tugas* anakBaru = new Tugas;
-        cout << "\n--------- Tambah Sub-Tugas untuk " << parent->namaTugas << " ---------" << endl;
-        cout << "Masukkan Nama: "; getline(cin, anakBaru->namaTugas);
-        anakBaru->mataKuliah = parent->mataKuliah;
-        anakBaru->deadline = parent->deadline;
-        anakBaru->prioritas = parent->prioritas;
-        anakBaru->status = "Belum";
-        anakBaru->subTugas = NULL;
-
-        anakBaru->next = parent->subTugas;
-        parent->subTugas = anakBaru;
-
-        cout << "--------------------------------------------------------" << endl;
-        cout << ">> Sub-Tugas Berhasil Ditambahkan!" << endl;
-        klikEnter();
     }
 
     void menuHierarki() {
@@ -508,13 +493,58 @@ public:
         cout << "--------------------------------------------------------" << endl;
         cout << "1. Buat Sub-Tugas Baru" << endl;
         cout << "0. Kembali" << endl;
-        cout << "Pilih: "; int pilih = inputAngka(0,1);
-        if (pilih == 1) tambahSubTugas();
-    }
-};
+        cout << "Pilih: "; 
+        int pilih = inputAngka(0, 1);
+        
+        if (pilih == 1) {
+            if (!head) {
+                cout << "--------------------------------------------------------" << endl;
+                cout << "Belum ada tugas utama. Tambahkan tugas dulu!" << endl;
+                klikEnter();
+                return;
+            }
 
-class SearchTugas : public Hierarki {
-public:
+            bersihkanLayar();
+            cout << "====================== PILIH TUGAS =====================" << endl;
+            Tugas* temp = head;
+            int jumlahTugas = 0;
+            while (temp) {
+                cout << ++jumlahTugas << ". " << temp->namaTugas << endl;
+                temp = temp->next;
+            }
+            cout << "--------------------------------------------------------" << endl;
+
+            int pilihanTugas;
+            cout << "Pilih nomor: "; 
+            pilihanTugas = inputAngka(1, jumlahTugas);
+
+            Tugas* parent = head;
+            for (int j = 1; j < pilihanTugas && parent; j++) parent = parent->next;
+
+            if (parent) {
+                Tugas* anakBaru = new Tugas;
+                cout << "\n--------- Tambah Sub-Tugas untuk " << parent->namaTugas << " ---------" << endl;
+                cout << "Masukkan Nama: "; 
+                cin.ignore();
+                getline(cin, anakBaru->namaTugas);
+                
+                // Menurunkan sifat/parent
+                anakBaru->mataKuliah = parent->mataKuliah;
+                anakBaru->deadline = parent->deadline;
+                anakBaru->prioritas = parent->prioritas;
+                anakBaru->status = "Belum";
+                anakBaru->subTugas = NULL;
+
+                anakBaru->next = parent->subTugas;
+                parent->subTugas = anakBaru;
+
+                cout << "--------------------------------------------------------" << endl;
+                cout << ">> Sub-Tugas Berhasil Ditambahkan!" << endl;
+                klikEnter();
+            }
+        }
+    }
+
     void cariTugas() {
         bersihkanLayar();
         if (!head) {
@@ -527,7 +557,7 @@ public:
         cout << "========== CARI TUGAS BERDASARKAN MATA KULIAH ==========" << endl;
         for (int i = 0; i < 8; i++) cout << i + 1 << ". " << daftarMatkul[i] << endl;
         cout << "--------------------------------------------------------" << endl;
-        cout << "Pilih Matkul yang dicari (1-8): "; pilih = inputAngka(1,8);
+        cout << "Pilih Matkul yang dicari (1-8): "; pilih = inputAngka(1, 8);
         cout << "--------------------------------------------------------" << endl;
 
         string kunci = daftarMatkul[pilih - 1];
@@ -539,6 +569,7 @@ public:
         cout << "HASIL PENCARIAN MATA KULIAH: " << kunci << endl;
         cout << "========================================================" << endl;
 
+        // Pencarian linear sederhana
         while (temp != NULL) {
             if (temp->mataKuliah == kunci) {
                 cout << no++ << ". Nama Tugas : " << temp->namaTugas << endl;
@@ -558,16 +589,15 @@ public:
 
         klikEnter();
     }
-};
 
-class DeleteTugas : public SearchTugas{
-public:
     void hapusTugas() {
         while (true) {
             bersihkanLayar();
             if (!head) { 
                 cout << "====================== HAPUS TUGAS =====================" << endl;
-                cout << "Daftar kosong." << endl; klikEnter(); return; 
+                cout << "Daftar kosong." << endl; 
+                klikEnter(); 
+                return; 
             }
 
             cout << "====================== HAPUS TUGAS =====================" << endl;
@@ -582,36 +612,38 @@ public:
             cout << "--------------------------------------------------------" << endl;
             int pilHapus;
             cout << "Masukkan Nomor: ";
-            while (true) {
-                cin >> pilHapus;
-                if (!cin.fail() && pilHapus >= 0 && pilHapus <= jumlahTugas) {
-                    cin.ignore(1000, '\n');
-                    break;
-                }
-                cin.clear();
-                cin.ignore(1000, '\n');
-                cout << "\nInput tidak valid! Masukkan angka yang benar: ";
-            }
+            pilHapus = inputAngka(0, jumlahTugas);
             if (pilHapus == 0) return;
 
-            Tugas* curr = head, *prev = NULL;
+            // Mencari node yang akan dihapus
+            Tugas* curr = head;
+            Tugas* prev = NULL;
             for (int i = 1; i < pilHapus; i++) {
                 prev = curr;
                 curr = curr->next;
             }
 
+            // Simpan copy dari node ke dalam Undo Stack (maks 10)
             if (topUndo < 9) {
-                Tugas* copyTugas = new Tugas(*curr);
-                copyTugas->next = NULL;
+                Tugas* copyTugas = new Tugas(*curr); 
                 undoStack[++topUndo] = copyTugas;
             }
 
-            if (!prev) head = curr->next;
-            else prev->next = curr->next;
+            // Lepaskan node dari LinkedList
+            if (prev == NULL) {
+                head = curr->next;
+            } else {
+                prev->next = curr->next;
+            }
 
             cout << "--------------------------------------------------------" << endl;
             cout << ">> Tugas '" << curr->namaTugas << "' & Sub-tugasnya Berhasil Dihapus!" << endl;
 
+            // Memastikan data di stack tidak memiliki subTugas yang bermasalah memori
+            undoStack[topUndo]->subTugas = NULL; 
+
+            // Hapus memori yang sebenarnya
+            hapusDariAntrian(curr);
             if (curr->subTugas) hapusSubTugas(curr->subTugas);
             delete curr;
 
@@ -619,10 +651,29 @@ public:
             break;
         }
     }
-};
 
-class RestoreTugas : public DeleteTugas {
-public:
+    void hapusDariAntrian(Tugas* target) {
+        NodeQueue* prev = NULL;
+        NodeQueue* curr = qFront;
+
+        while (curr) {
+            if (curr->dataTugas == target) {
+                if (prev == NULL) {
+                    qFront = curr->next;        
+                } else {
+                    prev->next = curr->next;    
+                }
+                if (curr->next == NULL) {
+                    qRear = prev;               
+                }
+                delete curr;
+                return;
+            }
+            prev = curr;
+            curr = curr->next;
+        }
+    }
+
     void pulihkanTugas() {
         if (topUndo == -1) {
             bersihkanLayar();
@@ -636,6 +687,7 @@ public:
             bersihkanLayar();
             cout << "==================== PULIHKAN TUGAS ====================" << endl;
             cout << "Pilih tugas yang ingin dipulihkan:" << endl;
+            
             int jumlahUndo = topUndo + 1;
             for (int i = 0; i <= topUndo; i++) {
                 cout << i + 1 << ". " << undoStack[i]->namaTugas << " (" << undoStack[i]->mataKuliah << ")" << endl;
@@ -645,29 +697,23 @@ public:
             cout << "--------------------------------------------------------" << endl;
             int pilih;
             cout << "Pilih Nomor: ";
-            while (true) {
-                cin >> pilih;
-                if (!cin.fail() && pilih >= 0 && pilih <= jumlahUndo) {
-                    cin.ignore(1000, '\n');
-                    break;
-                }
-                cin.clear();
-                cin.ignore(1000, '\n');
-                cout << "\nInput tidak valid! Masukkan angka yang benar: ";
-            }
+            pilih = inputAngka(0, jumlahUndo);
             if (pilih == 0) return;
 
             int idx = pilih - 1;
             Tugas* kembali = undoStack[idx];
 
+            // Geser sisa elemen stack
             for (int i = idx; i < topUndo; i++) {
                 undoStack[i] = undoStack[i + 1];
             }
             undoStack[topUndo] = NULL;
             topUndo--;
 
+            // Masukkan kembali ke List
             kembali->next = head;
             head = kembali;
+            
             cout << "--------------------------------------------------------" << endl;
             cout << ">> Tugas '" << kembali->namaTugas << "' telah dipulihkan!" << endl;
             klikEnter();
@@ -677,14 +723,17 @@ public:
 };
 
 int main() {
-    RestoreTugas sistem; 
+    FiturSistem sistem;
 
     while (true) {
-        string userNama = sistem.login();
+        string userNama = sistem.menuAwal(); 
+        sistem.tugasAwal(userNama);
+
         int pilihan;
         do {
             sistem.bersihkanLayar();
-            sistem.tampilkanDashboard(userNama);
+            sistem.tampilkanDashboard();
+            
             cout << "--------------------------------------------------------------" << endl;
             cout << "                         MENU UTAMA                           " << endl;
             cout << "--------------------------------------------------------------" << endl;
@@ -698,7 +747,8 @@ int main() {
             cout << "| 8. Keluar Akun                                             |" << endl;
             cout << "| 0. Tutup Program                                           |" << endl;
             cout << "--------------------------------------------------------------" << endl;
-            cout << "Pilih Menu: "; pilihan = inputAngka(0,8);
+            cout << "Pilih Menu: "; 
+            pilihan = sistem.inputAngka(0, 8);
 
             switch (pilihan) {
                 case 1: sistem.tambahTugas();    break;
@@ -708,11 +758,13 @@ int main() {
                 case 5: sistem.cariTugas();      break;
                 case 6: sistem.hapusTugas();     break;
                 case 7: sistem.pulihkanTugas();  break;
+                case 8: 
+                    break; 
                 case 0: 
-                cout << "======================================================" << endl;
-                cout << "   Terima kasih sudah menggunakan Program Ini ^^      " << endl;
-                cout << "======================================================" << endl;
-                return 0;
+                    cout << "======================================================" << endl;
+                    cout << "   Terima kasih sudah menggunakan Program Ini ^^      " << endl;
+                    cout << "======================================================" << endl;
+                    return 0;
             }
         } while (pilihan != 8);
 
