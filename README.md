@@ -16,3 +16,14 @@ Muhammad Farid Faqih_F5512510007
 3. Update Status Tugas
 4. Tampilkan Semua Tugas
 5. Filter Tugas
+
+## TAHAP 2 - UTS
+_kode program sudah diupdate_
+### Fitur Sistem
+1. Tambah Tugas
+2. Tampilkan Semua Tugas
+3. Tugas Yang Sedang Dikerjakan
+4. Manajemen Tugas Besar 
+5. Cari Tugas (Linear Search)
+6. Hapus Tugas
+7. Pulihkan Tugas
