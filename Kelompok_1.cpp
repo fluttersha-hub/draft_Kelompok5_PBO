@@ -8,7 +8,6 @@ struct Akun {
     string namaLengkap;
 };
 
-// Struct untuk Singly Linked List & Tree (Sub-tugas)
 struct Tugas {
     string namaTugas;
     string mataKuliah;
@@ -19,7 +18,7 @@ struct Tugas {
     Tugas* subTugas;   // Pointer ke sub-tugas (Tree / Hierarki)
 };
 
-// Struct untuk Queue (Antrian tugas yang dikerjakan)
+// Struct untuk Antrian tugas yang dikerjakan
 struct NodeQueue {
     Tugas* dataTugas;
     NodeQueue* next;
@@ -96,7 +95,7 @@ public:
                 for (int i = 0; i < jumlahAkun; i++) {
                     if (user == daftarAkun[i].username && pass == daftarAkun[i].password) {
                         namaUserAktif = daftarAkun[i].namaLengkap;
-                        return namaUserAktif; // Berhasil login, kirim nama user
+                        return namaUserAktif; 
                     }
                 }
                 
@@ -315,7 +314,7 @@ public:
                 }
 
                 if (harusTukar) {
-                    // Cukup tukar isinya, list tetap menyambung dengan baik
+                    // Isinya ditukar, list tetap menyambung dengan baik
                     swap(curr->namaTugas, curr->next->namaTugas);
                     swap(curr->mataKuliah, curr->next->mataKuliah);
                     swap(curr->deadline, curr->next->deadline);
