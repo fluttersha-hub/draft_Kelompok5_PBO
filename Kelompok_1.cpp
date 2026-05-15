@@ -2,12 +2,6 @@
 #include <string>
 using namespace std;
 
-struct Akun {
-    string username;
-    string password;
-    string namaLengkap;
-};
-
 struct Tugas {
     string namaTugas;
     string mataKuliah;
@@ -22,6 +16,19 @@ struct Tugas {
 struct NodeQueue {
     Tugas* dataTugas;
     NodeQueue* next;
+};
+
+struct Akun {
+    string username;
+    string password;
+    string namaLengkap;
+
+    Tugas* head = NULL;
+    Tugas* undoStack[10];
+    int topUndo = -1;
+    NodeQueue* qFront = NULL;
+    NodeQueue* qRear = NULL;
+    bool sudahInisialisasi = false;
 };
 
 class SistemDasar {
@@ -55,11 +62,12 @@ class SistemAkun {
 protected:
     Akun daftarAkun[50];
     int jumlahAkun;
-    string namaUserAktif;
+    int idUserAktif;
     SistemDasar util;
 
 public:
     SistemAkun() {
+        idUserAktif = -1;
         // Data akun bawaan
         daftarAkun[0] = {"omar", "omarganteng", "Humaira"};
         daftarAkun[1] = {"amiw", "1119", "Amisha"};
@@ -67,42 +75,21 @@ public:
         jumlahAkun = 3;
     }
 
-    string menuAwal() {
+    int menuAwal() {
         int pilihan;
         while (true) {
             util.bersihkanLayar();
             cout << "========================================================\n";
             cout << "            SISTEM MANAJEMEN TUGAS MAHASISWA            \n";
             cout << "========================================================\n";
-            cout << "1. Login\n";
-            cout << "2. Registrasi\n";
+            cout << "1. Registrasi Akun\n";
+            cout << "2. Masuk\n";
             cout << "0. Tutup Program\n";
             cout << "Pilih: ";
             pilihan = util.inputAngka(0, 2);
 
+            string user, pass;
             if (pilihan == 1) {
-                string user, pass;
-                util.bersihkanLayar();
-                cout << "========================================================\n";
-                cout << "            SISTEM MANAJEMEN TUGAS MAHASISWA            \n";
-                cout << "========================================================\n";
-                cout << "Silakan Masuk terlebih dahulu.\n";
-                cout << "Username: "; cin >> user;
-                cout << "Password: "; cin >> pass;
-                cin.ignore(); 
-
-                bool berhasil = false;
-                for (int i = 0; i < jumlahAkun; i++) {
-                    if (user == daftarAkun[i].username && pass == daftarAkun[i].password) {
-                        namaUserAktif = daftarAkun[i].namaLengkap;
-                        return namaUserAktif; 
-                    }
-                }
-                
-                cout << "\nAkses Ditolak! Username atau Password salah." << endl;
-                util.klikEnter();
-
-            } else if (pilihan == 2) {
                 util.bersihkanLayar();
                 cout << "========================================================\n";
                 cout << "                   REGISTRASI AKUN                      \n";
@@ -116,11 +103,30 @@ public:
                 cout << "\nRegistrasi Berhasil! Silakan Login menggunakan akun baru Anda.\n";
                 util.klikEnter();
 
+            } else if (pilihan == 2) {
+                util.bersihkanLayar();
+                cout << "========================================================\n";
+                cout << "                   MASUK KE AKUN ANDA                   \n";
+                cout << "========================================================\n";
+                cout << "Username   : "; cin >> user;
+                cout << "Password   : "; cin >> pass;
+                cin.ignore(); 
+
+                bool berhasil = false;
+                for (int i = 0; i < jumlahAkun; i++) {
+                    if (user == daftarAkun[i].username && pass == daftarAkun[i].password) {
+                        idUserAktif = i;
+                        return i;
+                    }
+                }
+                cout << "\nAkses Ditolak! Username atau Password salah." << endl;
+                util.klikEnter();
+
             } else {
                 cout << "======================================================" << endl;
                 cout << "   Terima kasih sudah menggunakan Program Ini ^^      " << endl;
                 cout << "======================================================" << endl;
-                return 0;
+                return -1;
             }
         }
     }
@@ -128,11 +134,15 @@ public:
 
 class ManajemenTugas : public SistemDasar, public SistemAkun {
 protected:
-    Tugas* head;              // Head Singly Linked List
-    Tugas* undoStack[10];     // Array of Pointers untuk Stack Undo (Hapus)
-    int topUndo;
-    NodeQueue* qFront;        // Front Queue
-    NodeQueue* qRear;         // Rear Queue
+    Tugas*& getHead() { 
+        return daftarAkun[idUserAktif].head; 
+    }
+    NodeQueue*& getQFront() { 
+        return daftarAkun[idUserAktif].qFront; 
+    }
+    NodeQueue*& getQRear() { 
+        return daftarAkun[idUserAktif].qRear; 
+    }
 
     string daftarMatkul[8] = {
         "Struktur Data", "OOP", "Statistika dan Probabilitas",
@@ -142,10 +152,7 @@ protected:
 
 public:
     ManajemenTugas() {
-        head = NULL;
-        topUndo = -1;
-        qFront = NULL;
-        qRear = NULL;
+        
     }
 
     void hapusSubTugas(Tugas* n) {
@@ -153,25 +160,6 @@ public:
         if (n->subTugas) hapusSubTugas(n->subTugas);
         if (n->next) hapusSubTugas(n->next);
         delete n;
-    }
-
-    void resetData() {
-        while (head != NULL) {
-            Tugas* temp = head;
-            head = head->next;
-            if (temp->subTugas) hapusSubTugas(temp->subTugas);
-            delete temp;
-        }
-        while (qFront) {
-            NodeQueue* hapus = qFront;
-            qFront = qFront->next;
-            delete hapus;
-        }
-        qRear = NULL;
-        for (int i = 0; i <= topUndo; i++) {
-            delete undoStack[i];
-        }
-        topUndo = -1;
     }
 
     void inisialisasiTugas(string nama, string mk, string dl, int prio) {
@@ -182,12 +170,16 @@ public:
         baru->prioritas = prio;
         baru->status = "Belum";
         baru->subTugas = NULL;
-        baru->next = head;
-        head = baru;
+        baru->next = getHead();
+        getHead() = baru;
     }
 
-    void tugasAwal(string namaLengkap) {
-        resetData();
+    void tugasAwal() {
+        if (idUserAktif == -1) return;
+        if (daftarAkun[idUserAktif].sudahInisialisasi) return;
+
+        string namaLengkap = daftarAkun[idUserAktif].namaLengkap;
+
         if (namaLengkap == "Humaira") {
             inisialisasiTugas("Laporan Praktikum", "Struktur Data", "19052026", 1);
             inisialisasiTugas("Laporan Proposal", "Kewirausahaan", "25052026", 2);
@@ -196,12 +188,17 @@ public:
             inisialisasiTugas("Tugas DataSet", "Statistika dan Probabilitas", "21052026", 1);
             inisialisasiTugas("Membuat Resume", "Kewarganegaraan", "22052026", 3);
         }
+
+        daftarAkun[idUserAktif].sudahInisialisasi = true;
     }
 };
 
 class FiturSistem : public ManajemenTugas {
 public:
-        void tampilkanDashboard() {
+    void tampilkanDashboard() {
+        Tugas*& head = getHead(); 
+        NodeQueue*& qFront = getQFront();
+            
         int total = 0, selesai = 0;
         Tugas* temp = head;
         while (temp != NULL) {
@@ -216,7 +213,7 @@ public:
         cout << "==============================================================" << endl;
         cout << "               SISTEM MANAJEMEN TUGAS MAHASISWA               " << endl;
         cout << "==============================================================" << endl;
-        cout << "| Halo, " << namaUserAktif << "!" << endl;
+        cout << "| Halo, " << daftarAkun[idUserAktif].namaLengkap << "!" << endl;
         cout << "  Hari Ini: Selasa, 19/05/2026" << endl << endl;
 
         cout << "+--------------------- STATISTIK TUGAS ----------------------+" << endl;
@@ -262,11 +259,12 @@ public:
     }
 
     void tambahTugas() {
+        Tugas*& head = getHead();
         bersihkanLayar();
+        
         Tugas* baru = new Tugas;
         cout << "=============== TAMBAH TUGAS BARU ===============" << endl;
         cout << "\nNama Tugas         : "; 
-        cin.ignore();
         getline(cin, baru->namaTugas);
 
         cout << "-------------------------------------------------" << endl;
@@ -295,6 +293,8 @@ public:
     }
 
     void urutkanTugas() {
+        Tugas*& head = getHead();
+
         if (!head || !head->next) return;
 
         bool ditukar;
@@ -331,6 +331,8 @@ public:
 
     void tampilkanTugas() {
         int tugasPilihan;
+        Tugas*& head = getHead();
+
         do {
             bersihkanLayar();
             cout << "================== DAFTAR TUGAS SAAT INI ==================\n\n";
@@ -373,6 +375,10 @@ public:
 
     void menuTugasDikerjakan() {
         int pilih;
+        Tugas*& head = getHead();
+        NodeQueue*& qFront = getQFront(); 
+        NodeQueue*& qRear = getQRear();
+
         do {
             bersihkanLayar();
             cout << "================== TUGAS YANG SEDANG DIKERJAKAN ==================" << endl << endl;
@@ -484,6 +490,7 @@ public:
     }
 
     void menuHierarki() {
+        Tugas*& head = getHead();
         bersihkanLayar();
         cout << "================= POHON RENCANA TUGAS =================" << endl;
         if (!head) cout << "Data Kosong." << endl;
@@ -524,7 +531,6 @@ public:
                 Tugas* anakBaru = new Tugas;
                 cout << "\n--------- Tambah Sub-Tugas untuk " << parent->namaTugas << " ---------" << endl;
                 cout << "Masukkan Nama: "; 
-                cin.ignore();
                 getline(cin, anakBaru->namaTugas);
                 
                 // Menurunkan sifat/parent
@@ -545,6 +551,7 @@ public:
     }
 
     void cariTugas() {
+        Tugas*& head = getHead();
         bersihkanLayar();
         if (!head) {
             cout << "Daftar tugas kosong." << endl;
@@ -590,6 +597,10 @@ public:
     }
 
     void hapusTugas() {
+        Tugas*& head = getHead();                           
+        int& topUndo = daftarAkun[idUserAktif].topUndo;     
+        auto& undoStack = daftarAkun[idUserAktif].undoStack;
+
         while (true) {
             bersihkanLayar();
             if (!head) { 
@@ -625,6 +636,8 @@ public:
             // Simpan copy dari node ke dalam Undo Stack (maks 10)
             if (topUndo < 9) {
                 Tugas* copyTugas = new Tugas(*curr); 
+                copyTugas->next = NULL; 
+                copyTugas->subTugas = NULL;
                 undoStack[++topUndo] = copyTugas;
             }
 
@@ -652,6 +665,9 @@ public:
     }
 
     void hapusDariAntrian(Tugas* target) {
+        Tugas*& head = getHead();
+        NodeQueue*& qFront = getQFront(); 
+        NodeQueue*& qRear = getQRear();
         NodeQueue* prev = NULL;
         NodeQueue* curr = qFront;
 
@@ -674,6 +690,10 @@ public:
     }
 
     void pulihkanTugas() {
+        Tugas*& head = getHead();                           
+        int& topUndo = daftarAkun[idUserAktif].topUndo;     
+        auto& undoStack = daftarAkun[idUserAktif].undoStack;
+
         if (topUndo == -1) {
             bersihkanLayar();
             cout << "==================== PULIHKAN TUGAS ====================" << endl;
@@ -725,8 +745,10 @@ int main() {
     FiturSistem sistem;
 
     while (true) {
-        string userNama = sistem.menuAwal(); 
-        sistem.tugasAwal(userNama);
+        int userId = sistem.menuAwal(); 
+        if (userId == -1) break;
+
+        sistem.tugasAwal();
 
         int pilihan;
         do {
@@ -766,8 +788,6 @@ int main() {
                     return 0;
             }
         } while (pilihan != 8);
-
-        sistem.resetData();
     }
     return 0;
 }
