@@ -181,12 +181,12 @@ public:
         string namaLengkap = daftarAkun[idUserAktif].namaLengkap;
 
         if (namaLengkap == "Humaira") {
-            inisialisasiTugas("Laporan Praktikum", "Struktur Data", "19052026", 1);
-            inisialisasiTugas("Laporan Proposal", "Kewirausahaan", "25052026", 2);
-            inisialisasiTugas("Project Akhir", "OOP", "27052026", 3);
+            inisialisasiTugas("Laporan Praktikum", "Struktur Data", "20260519", 1);
+            inisialisasiTugas("Laporan Proposal", "Kewirausahaan", "20260525", 2);
+            inisialisasiTugas("Project Akhir", "OOP", "20260527", 3);
         } else if (namaLengkap == "Amisha") {
-            inisialisasiTugas("Tugas DataSet", "Statistika dan Probabilitas", "21052026", 1);
-            inisialisasiTugas("Membuat Resume", "Kewarganegaraan", "22052026", 3);
+            inisialisasiTugas("Tugas DataSet", "Statistika dan Probabilitas", "20260521", 1);
+            inisialisasiTugas("Membuat Resume", "Kewarganegaraan", "20260522", 3);
         }
 
         daftarAkun[idUserAktif].sudahInisialisasi = true;
@@ -233,7 +233,7 @@ public:
 
         cout << "------------------------ INFO TUGAS --------------------------" << endl;
         temp = head;
-        string batasTanggal = "19052026";
+        string batasTanggal = "20260519";
         bool ada = false;
 
         while (temp) {
@@ -278,7 +278,7 @@ public:
 
         cout << "-------------------------------------------------" << endl;
         baru->mataKuliah = daftarMatkul[pilih - 1];
-        cout << "Deadline (DDMMYYYY): "; cin >> baru->deadline;
+        cout << "Deadline (YYYYMMDD): "; cin >> baru->deadline;
         cout << "\n1 = Sangat Penting | 2 = Penting | 3 = Tidak Mendesak" << endl;
         cout << "Prioritas            : "; baru->prioritas = inputAngka(1, 3);
         
