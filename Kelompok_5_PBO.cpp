@@ -15,12 +15,10 @@ int getValidInt(int minVal, int maxVal = 999999) {
         cin >> input;
         if (cin.fail()) {
             cin.clear(); cin.ignore(10000, '\n');
-            cout << "Input tidak valid! Harap masukkan angka: ";
+            cout << "\nInput tidak valid! Harap masukkan angka: ";
         } else if (input < minVal || input > maxVal) {
             cin.ignore(10000, '\n');
-            cout << "Pilihan di luar jangkauan (" << minVal;
-            if (maxVal != 999999) cout << " - " << maxVal;
-            cout << "). Coba lagi: ";
+            cout << "\nPilihan tidak valid! Masukkan kembali: ";
         } else { cin.ignore(10000, '\n'); return input; }
     }
 }
@@ -31,10 +29,10 @@ double getValidDouble(double minVal) {
         cin >> input;
         if (cin.fail()) {
             cin.clear(); cin.ignore(10000, '\n');
-            cout << "Input tidak valid! Harap masukkan angka: ";
+            cout << "\nInput tidak valid! Harap masukkan angka: ";
         } else if (input < minVal) {
             cin.ignore(10000, '\n');
-            cout << "Angka tidak boleh kurang dari " << minVal << ". Coba lagi: ";
+            cout << "\nAngka tidak boleh kurang dari " << minVal << ". Coba lagi: ";
         } else { cin.ignore(10000, '\n'); return input; }
     }
 }
@@ -110,27 +108,27 @@ public:
         cout << "\n  ┌──────────────────────────────────────────────────────────┐\n"
             << "  │                  INVOICE TRANSAKSI                       │\n"
             << "  ├──────────────────────────────────────────────────────────┤\n"
-            << "  │  ID Transaksi  : #" << left << setw(40) << idTransaksi << "│\n"
-            << "  │  Username      : "  << left << setw(41) << username    << "│\n"
-            << "  │  Metode Bayar  : "  << left << setw(41) << metodeBayar << "│\n"
-            << "  │  Status        : "  << left << setw(41) << status      << "│\n"
+            << "  │  ID Transaksi  : #" << left << setw(39) << idTransaksi << "│\n"
+            << "  │  Username      : "  << left << setw(40) << username    << "│\n"
+            << "  │  Metode Bayar  : "  << left << setw(40) << metodeBayar << "│\n"
+            << "  │  Status        : "  << left << setw(40) << status      << "│\n"
             << "  ├──────────────────────────────────────────────────────────┤\n";
         for (int i = 0; i < itemCount; i++) {
             int    qty  = items[i].qty;
             double hSat = items[i].produk->getHarga();
             string hTotStr = to_string(qty) + " x Rp " + to_string((int)hSat)
                            + " = Rp " + to_string((int)(hSat * qty));
-            cout << "  │  Nama Produk   : " << left << setw(41) << items[i].produk->getNama()      << "│\n"
-                << "  │  Merk          : " << left << setw(41) << items[i].produk->getMerk()      << "│\n"
-                << "  │  Kategori      : " << left << setw(41) << items[i].produk->getKategori()  << "│\n"
-                << "  │  Jumlah        : " << left << setw(41) << qty                             << "│\n"
-                << "  │  Harga Satuan  : Rp " << left << setw(38) << fixed << setprecision(0) << hSat << "│\n"
-                << "  │  Harga Total   : " << left << setw(41) << hTotStr                        << "│\n";
+            cout << "  │  Nama Produk   : " << left << setw(40) << items[i].produk->getNama()      << "│\n"
+                << "  │  Merk          : " << left << setw(40) << items[i].produk->getMerk()      << "│\n"
+                << "  │  Kategori      : " << left << setw(40) << items[i].produk->getKategori()  << "│\n"
+                << "  │  Jumlah        : " << left << setw(40) << qty                             << "│\n"
+                << "  │  Harga Satuan  : Rp " << left << setw(37) << fixed << setprecision(0) << hSat << "│\n"
+                << "  │  Harga Total   : " << left << setw(40) << hTotStr                        << "│\n";
             if (i < itemCount - 1)
-                cout << "  │  - - - - - - - - - - - - - - - - - - - - - - - - - - - -│\n";
+                cout << "  │  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n";
         }
         cout << "  ├──────────────────────────────────────────────────────────┤\n"
-            << "  │  TOTAL         : Rp " << left << setw(38) << fixed << setprecision(0) << totalHarga << "│\n"
+            << "  │  TOTAL         : Rp " << left << setw(37) << fixed << setprecision(0) << totalHarga << "│\n"
             << "  └──────────────────────────────────────────────────────────┘\n";
     }
 };
@@ -144,7 +142,7 @@ public:
     void tambahProduk(Produk* p, int qty) {
         if (itemCount >= 50) { cout << "  Error: Keranjang penuh!\n"; return; }
         items[itemCount++] = {p, qty};
-        cout << "  Produk berhasil ditambahkan ke keranjang!\n";
+        cout << "\n  Produk berhasil ditambahkan ke keranjang!\n";
     }
     double hitungTotal() {
         double total = 0;
@@ -159,33 +157,33 @@ public:
             << "  ├──────────────────────────────────────────────────────────┤\n";
         for (int i = 0; i < itemCount; i++) {
             int qty = items[i].qty; double hSat = items[i].produk->getHarga();
-            cout << "  │  " << left << setw(58) << (to_string(i+1) + ". " + items[i].produk->getNama()) << "│\n"
-                << "  │  " << left << setw(58) << ("   x" + to_string(qty) + " @ Rp " + to_string((int)hSat) + "  =  Rp " + to_string((int)(hSat*qty))) << "│\n";
+            cout << "  │  " << left << setw(56) << (to_string(i+1) + ". " + items[i].produk->getNama()) << "│\n"
+                << "  │  " << left << setw(56) << ("   x" + to_string(qty) + " = Rp " + to_string((int)hSat) + "  =  Rp " + to_string((int)(hSat*qty))) << "│\n";
             if (i < itemCount - 1)
                 cout << "  │                                                          │\n";
         }
         cout << "  ├──────────────────────────────────────────────────────────┤\n"
-            << "  │  " << left << setw(58) << ("Total Belanja : Rp " + to_string((int)hitungTotal())) << "│\n"
+            << "  │  " << left << setw(56) << ("Total Belanja : Rp " + to_string((int)hitungTotal())) << "│\n"
             << "  └──────────────────────────────────────────────────────────┘\n";
     }
     // Overload 2: tampilkan filter per kategori
     void tampilkan(string kategori) {
         double sub = 0; bool ada = false; int nomor = 1;
         cout << "\n  ┌──────────────────────────────────────────────────────────┐\n"
-            << "  │           ISI KERANJANG [" << left << setw(32) << kategori << "]│\n"
+            << "  │                ISI KERANJANG [" << kategori << left << setw(19) << "]" << "│\n"
             << "  ├──────────────────────────────────────────────────────────┤\n";
         for (int i = 0; i < itemCount; i++) {
             if (items[i].produk->getKategori() != kategori) continue;
             ada = true;
             int qty = items[i].qty; double hSat = items[i].produk->getHarga(); double tot = hSat * qty;
             sub += tot;
-            cout << "  │  " << left << setw(58) << (to_string(nomor++) + ". " + items[i].produk->getNama()) << "│\n"
-                << "  │  " << left << setw(58) << ("   x" + to_string(qty) + " @ Rp " + to_string((int)hSat) + "  =  Rp " + to_string((int)tot)) << "│\n"
+            cout << "  │  " << left << setw(56) << (to_string(nomor++) + ". " + items[i].produk->getNama()) << "│\n"
+                << "  │  " << left << setw(56) << ("   x" + to_string(qty) + " = Rp " + to_string((int)hSat) + "  =  Rp " + to_string((int)tot)) << "│\n"
                 << "  │                                                          │\n";
         }
-        if (!ada) cout << "  │  " << left << setw(58) << "Tidak ada produk kategori ini di keranjang." << "│\n";
+        if (!ada) cout << "  │  " << left << setw(56) << "Tidak ada produk kategori ini di keranjang." << "│\n";
         cout << "  ├──────────────────────────────────────────────────────────┤\n"
-            << "  │  " << left << setw(58) << ("Total [" + kategori + "] : Rp " + to_string((int)sub)) << "│\n"
+            << "  │  " << left << setw(56) << ("Total [" + kategori + "] : Rp " + to_string((int)sub)) << "│\n"
             << "  └──────────────────────────────────────────────────────────┘\n";
     }
     void clear()              { itemCount = 0; }
@@ -208,7 +206,7 @@ public:
     Keranjang* getKeranjang() { return &keranjang; }
     void tambahRiwayat(Transaksi* t) { if (riwayatCount < 50) riwayat[riwayatCount++] = t; }
     void tampilkanRiwayat() {
-        if (riwayatCount == 0) { cout << "  Belum ada riwayat transaksi.\n"; return; }
+        if (riwayatCount == 0) { cout << "\n  Belum ada riwayat transaksi.\n"; return; }
         for (int i = 0; i < riwayatCount; i++) riwayat[i]->tampilkanInvoice();
     }
 };
@@ -245,22 +243,22 @@ void cetakHeaderKatalog() {
 }
 
 void tampilkanKatalog() {
-    cout << "\n==================================================================================================\n"
-        << "                                KATALOG PRODUK BEAUTY STORE                                     \n"
-        << "==================================================================================================\n";
+    cout << "\n====================================================================================================\n"
+        << "                                          KATALOG PRODUK                                          \n"
+        << "====================================================================================================\n";
     cetakHeaderKatalog();
     for (int i = 0; i < jumlahProduk; i++) katalog[i]->tampilkanInfo(i + 1);
-    cout << "==================================================================================================\n";
+    cout << "=====================================================================================================\n";
 }
 
 void tampilkanKatalogKategori(string kategori) {
     cout << "\n  Produk dalam kategori [" << kategori << "]:\n"
-        << "--------------------------------------------------------------------------------------------------\n";
+        << "--------------------------------------------------------------------------------------------------------\n";
     cetakHeaderKatalog();
     bool ada = false;
     for (int i = 0; i < jumlahProduk; i++)
         if (katalog[i]->getKategori() == kategori) { katalog[i]->tampilkanInfo(i + 1); ada = true; }
-    cout << "--------------------------------------------------------------------------------------------------\n";
+    cout << "--------------------------------------------------------------------------------------------------------\n";
     if (!ada) cout << "  Tidak ada produk dalam kategori ini.\n";
 }
 
@@ -315,16 +313,16 @@ void fiturKeranjang(User* userLogin) {
 
         double subtotal = p->getHarga() * qty;
         string subStr = to_string(qty) + " x Rp " + to_string((int)p->getHarga()) + " = Rp " + to_string((int)subtotal);
-        cout << "\n  ┌──────────────────────────────────────────────────────────┐\n"
-            << "  │                 RINGKASAN PRODUK                         │\n"
-            << "  ├──────────────────────────────────────────────────────────┤\n"
-            << "  │  Nama Produk  : " << left << setw(43) << p->getNama()     << "│\n"
-            << "  │  Merk         : " << left << setw(43) << p->getMerk()     << "│\n"
-            << "  │  Kategori     : " << left << setw(43) << p->getKategori() << "│\n"
-            << "  │  Harga Satuan : Rp " << left << setw(40) << fixed << setprecision(0) << p->getHarga() << "│\n"
-            << "  │  Jumlah       : " << left << setw(43) << qty              << "│\n"
-            << "  │  Subtotal     : " << left << setw(43) << subStr           << "│\n"
-            << "  └──────────────────────────────────────────────────────────┘\n"
+        cout << "\n  ┌─────────────────────────────────────────────────────────┐\n"
+            << "  │                 RINGKASAN PRODUK                        │\n"
+            << "  ├─────────────────────────────────────────────────────────┤\n"
+            << "  │  Nama Produk  : " << left << setw(40) << p->getNama()     << "│\n"
+            << "  │  Merk         : " << left << setw(40) << p->getMerk()     << "│\n"
+            << "  │  Kategori     : " << left << setw(40) << p->getKategori() << "│\n"
+            << "  │  Harga Satuan : Rp " << left << setw(37) << fixed << setprecision(0) << p->getHarga() << "│\n"
+            << "  │  Jumlah       : " << left << setw(40) << qty              << "│\n"
+            << "  │  Subtotal     : " << left << setw(40) << subStr           << "│\n"
+            << "  └─────────────────────────────────────────────────────────┘\n"
             << "  Masukkan ke keranjang? (y/n): ";
         string konfirmasi; getline(cin, konfirmasi);
         if (konfirmasi == "y" || konfirmasi == "Y")
@@ -342,10 +340,10 @@ void menuUser(User* userLogin) {
     int pilihan;
     do {
         cout << "\n  ╔═════════════════════════════════════════╗\n"
-            << "  ║         GLOWUP BEAUTY STORE             ║\n"
+            << "  ║            VIVAN BEAUTY STORE           ║\n"
             << "  ╚═════════════════════════════════════════╝\n"
-            << "\n  ┌─────────────────────────────────────────┐\n"
-            << "  │           MENU PENGGUNA                 │\n"
+            << "  ┌─────────────────────────────────────────┐\n"
+            << "  │              MENU PENGGUNA              │\n"
             << "  │  Halo, " << left << setw(33) << userLogin->getNama() << "│\n"
             << "  ├─────────────────────────────────────────┤\n"
             << "  │   1. Lihat Semua Katalog                │\n"
@@ -392,7 +390,7 @@ void menuUser(User* userLogin) {
                     int count = userLogin->getKeranjang()->getCount();
                     for (int i = 0; i < count; i++)
                         if (items[i].produk->getStok() < items[i].qty)
-                            { cout << "  Maaf, stok " << items[i].produk->getNama() << " habis/kurang.\n"; valid = false; break; }
+                            { cout << "\n  Maaf, stok " << items[i].produk->getNama() << " habis/kurang.\n"; valid = false; break; }
                     if (valid) {
                         double total = userLogin->getKeranjang()->hitungTotal();
                         cout << "\n  ┌─────────────────────────────────────────┐\n"
@@ -429,10 +427,10 @@ void menuAdmin() {
     int pilihan;
     do {
         cout << "\n  ╔═════════════════════════════════════════╗\n"
-            << "  ║         GLOWUP BEAUTY STORE             ║\n"
+            << "  ║            VIVAN BEAUTY STORE           ║\n"
             << "  ╚═════════════════════════════════════════╝\n"
-            << "\n  ┌─────────────────────────────────────────┐\n"
-            << "  │          MENU ADMINISTRATOR             │\n"
+            << "  ┌─────────────────────────────────────────┐\n"
+            << "  │                MENU ADMIN               │\n"
             << "  ├─────────────────────────────────────────┤\n"
             << "  │   1. Lihat Katalog Produk               │\n"
             << "  │   2. Tambah Produk Baru                 │\n"
@@ -460,7 +458,7 @@ void menuAdmin() {
                 cout << "  Berat (g)   : "; double b = getValidDouble(0);
                 katalog[jumlahProduk++] = new ProdukFisik(n, m, h, s, k, b);
             }
-            cout << "  Produk baru berhasil ditambahkan!\n";
+            cout << "\n  Produk baru berhasil ditambahkan!\n";
         }
         else if (pilihan == 3) {
             tampilkanKatalog();
@@ -496,7 +494,7 @@ void menuAdmin() {
                     cout << "  Status berhasil diperbarui!\n"; break;
                 }
             }
-            if (!found) cout << "  Error: ID Transaksi tidak ditemukan.\n";
+            if (!found) cout << "\n  Error: ID Transaksi tidak ditemukan.\n";
         }
     } while (pilihan != 0);
 }
@@ -507,9 +505,9 @@ int main() {
     int menu;
     do {
         cout << "\n  ╔═════════════════════════════════════════╗\n"
-            << "  ║         GLOWUP BEAUTY STORE             ║\n"
+            << "  ║            VIVAN BEAUTY STORE           ║\n"
             << "  ╚═════════════════════════════════════════╝\n"
-            << "\n  ┌─────────────────────────────────────────┐\n"
+            << "  ┌─────────────────────────────────────────┐\n"
             << "  │              MENU UTAMA                 │\n"
             << "  ├─────────────────────────────────────────┤\n"
             << "  │   1. Registrasi User Baru               │\n"
@@ -530,8 +528,8 @@ int main() {
             bool exist = false;
             for (int i = 0; i < jumlahUser; i++)
                 if (users[i].getUsername() == uname) { exist = true; break; }
-            if (exist) cout << "  Username sudah terdaftar! Gunakan yang lain.\n";
-            else { users[jumlahUser++] = User(uname, pass, nama); cout << "  Registrasi berhasil! Silahkan login.\n"; }
+            if (exist) cout << "\n  Username sudah terdaftar! Gunakan yang lain.\n";
+            else { users[jumlahUser++] = User(uname, pass, nama); cout << "\n  Registrasi berhasil! Silakan login.\n"; }
         }
         else if (menu == 2) {
             string uname, pass;
@@ -542,16 +540,16 @@ int main() {
                 if (users[i].getUsername() == uname && users[i].getPassword() == pass)
                     { loggedInUser = &users[i]; break; }
             if (loggedInUser) menuUser(loggedInUser);
-            else cout << "  Username atau Password salah!\n";
+            else cout << "\n  Username atau Password salah!\n";
         }
         else if (menu == 3) {
             string pass; cout << "  Password Admin: "; getline(cin, pass);
             if (pass == "admin123") menuAdmin();
-            else cout << "  Password Admin salah!\n";
+            else cout << "\n  Password Admin salah!\n";
         }
     } while (menu != 0);
 
-    cout << "\n  Terima kasih telah menggunakan layanan GlowUp Beauty Store!\n";
+    cout << "\n  Terima kasih telah menggunakan layanan Vivan Beauty Store!\n";
     for (int i = 0; i < jumlahProduk;    i++) delete katalog[i];
     for (int i = 0; i < jumlahTransaksi; i++) delete semuaTransaksi[i];
     return 0;
