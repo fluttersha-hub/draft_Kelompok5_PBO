@@ -125,7 +125,7 @@ public:
                 << "  │  Harga Satuan  : Rp " << left << setw(37) << fixed << setprecision(0) << hSat << "│\n"
                 << "  │  Harga Total   : " << left << setw(40) << hTotStr                        << "│\n";
             if (i < itemCount - 1)
-                cout << "  │  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n";
+                cout << "  │  - - - - - - - - - - - - - - - - - - - - - - - - - - - - │\n";
         }
         cout << "  ├──────────────────────────────────────────────────────────┤\n"
             << "  │  TOTAL         : Rp " << left << setw(37) << fixed << setprecision(0) << totalHarga << "│\n"
@@ -494,7 +494,7 @@ void menuAdmin() {
                     cout << "  Status berhasil diperbarui!\n"; break;
                 }
             }
-            if (!found) cout << "\n  Error: ID Transaksi tidak ditemukan.\n";
+            if (!found) cout << "\n Error: ID Transaksi tidak ditemukan.\n";
         }
     } while (pilihan != 0);
 }
