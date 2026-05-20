@@ -544,7 +544,7 @@ int main() {
         }
         else if (menu == 3) {
             string pass; cout << "  Password Admin: "; getline(cin, pass);
-            if (pass == "admin123") menuAdmin();
+            if (pass == "admink123") menuAdmin();
             else cout << "\n  Password Admin salah!\n";
         }
     } while (menu != 0);
